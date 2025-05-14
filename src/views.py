@@ -1,0 +1,94 @@
+# Страница «Главная»
+import datetime
+from typing import Any
+
+import pandas as pd
+
+from config import PATH_XLSX
+from loggers import get_logger
+from src.utils import read_finance_excel_operation
+from src.requests_api import external_request_api_currency, external_request_api_sp_500
+
+logger = get_logger()
+
+
+
+
+def greetings (date_string: str) -> str:
+    """Приветствие по времени суток в зависимости от переданной даты со временем """
+    date_obj = datetime.datetime.strptime(date_string, "%Y-%m-%d %H:%M:%S")
+    if 0 >= date_obj.hour > 5:
+        return "Доброй ночи"
+    elif 5 >= date_obj.hour > 12:
+        return "Доброе утро"
+    elif 12 >= date_obj.hour > 18:
+        return "Добрый день"
+    elif 18 >= date_obj.hour > 24:
+        return "Добрый вечер"
+
+
+def return_courses() -> Any:
+    """Ответ API запроса.
+    Курсы валют и акций."""
+
+    logger.info("Запуск.")
+
+    course_currency = external_request_api_currency()
+    user_settings = external_request_api_sp_500()
+
+    return course_currency, user_settings
+
+
+def card_number(transactions: pd.DataFrame) -> Any:
+    """Последние 4 цифры карты.
+    Общая сумма расходов;
+    Кэшбэк."""
+
+    logger.info("Запуск.")
+
+    cards_list = []
+
+    add_group_data = transactions.groupby("Номер карты").agg({"Сумма операции с округлением": "sum", "Кэшбэк": "sum"})
+    for c_number, row in add_group_data.iterrows():
+        inform_to_card = {
+            "last_digits": str(c_number)[-4:],
+            "total_spent": float(row["Сумма операции с округлением"]),
+            "cashback": float(row["Кэшбэк"]),
+        }
+        cards_list.append(inform_to_card)
+
+    return cards_list
+
+
+def top_transactions(transactions: pd.DataFrame) -> Any:
+    """Выводит пять самых крупных транзакций"""
+
+    logger.info("Запуск.")
+
+    best_transaction = []
+
+    best_data = transactions.sort_values(by="Сумма операции с округлением", ascending=False).head(5)
+    for data, row in best_data.iterrows():
+        best_transaction.append(
+            {
+                "date": row["Дата платежа"],
+                "amount": float(row["Сумма операции с округлением"]),
+                "category": row["Категория"],
+                "description": row["Описание"],
+            }
+        )
+
+    return best_transaction
+
+
+def main_page(date: Any) -> dict:
+    """Функция главной страницы."""
+
+    json_response = {
+        "greeting": greetings(date),
+        "cards": card_number(read_finance_excel_operation(PATH_XLSX)),
+        "top_transactions": top_transactions(read_finance_excel_operation(PATH_XLSX)),
+        "currency_rates": external_request_api_currency(),
+        "stock_prices": external_request_api_sp_500()
+    }
+    return json_response

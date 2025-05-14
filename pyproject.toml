@@ -8,6 +8,9 @@ authors = [
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "requests (>=2.32.3,<3.0.0)",
+    "pandas (>=2.2.3,<3.0.0)",
+    "dotenv (>=0.9.9,<0.10.0)"
 ]
 
 
@@ -20,6 +23,10 @@ mypy = "^1.15.0"
 black = "^25.1.0"
 isort = "^6.0.1"
 flake8 = "^7.2.0"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.5"
 
 [tool.black]
 line-length = 119
