@@ -14,17 +14,23 @@ logger = get_logger()
 
 
 
-def greetings (date_string: str) -> str:
+def greetings (date_now=datetime.datetime.now()) -> Any:
     """Приветствие по времени суток в зависимости от переданной даты со временем """
-    date_obj = datetime.datetime.strptime(date_string, "%Y-%m-%d %H:%M:%S")
-    if 0 >= date_obj.hour > 5:
-        return "Доброй ночи"
-    elif 5 >= date_obj.hour > 12:
-        return "Доброе утро"
-    elif 12 >= date_obj.hour > 18:
-        return "Добрый день"
-    elif 18 >= date_obj.hour > 24:
-        return "Добрый вечер"
+
+    logger.info("Запуск.")
+
+    hello_user = ""
+
+    if 6 >= date_now.hour > 0:
+            hello_user = "Доброй ночи!"
+    if 6 < date_now.hour <= 12:
+            hello_user = "Доброе утро!"
+    if 12 < date_now.hour <= 18:
+            hello_user = "Добрый день!"
+    if 18 < date_now.hour <= 23:
+            hello_user = "Добрый вечер!"
+
+    return hello_user
 
 
 def return_courses() -> Any:

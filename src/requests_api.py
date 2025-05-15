@@ -51,18 +51,16 @@ def external_request_api_currency() -> Any:
     user_stocks = read_user_settings()
 
     for st in user_stocks["user_currencies"]:
-        # try:
-        #     url = f"https://www.alphavantage.co/query?function=TIME_SERIES_WEEKLY&symbol={st}&apikey={API_KEY}"
-        #
-        #     headers = {"apikey": API_KEY}
-        #
-        #     response_currency = requests.get(url, headers=headers)
-        #
-        #     result_api.append(response_currency.json()["USD"]["Weekly Time Series"]["2025-03-28"]["2. high"])
-        # except Exception as error:
-        #     logger.error(f"Ошибка API запроса {error}")
-        if st: # для проверки , из-за ограничения количества запросов (код выше раскомментировать, эту строку убрать)
-            return 0.0
+        try:
+            url = f"https://www.alphavantage.co/query?function=TIME_SERIES_WEEKLY&symbol={st}&apikey={API_KEY}"
+
+            headers = {"apikey": API_KEY}
+
+            response_currency = requests.get(url, headers=headers)
+
+            result_api.append(response_currency.json()["USD"]["Weekly Time Series"]["2025-03-28"]["2. high"])
+        except Exception as error:
+            logger.error(f"Ошибка API запроса {error}")
 
     result = dict(zip(user_stocks["user_currencies"], result_api))
 
@@ -77,3 +75,7 @@ def read_user_settings() -> dict:
         data = dict(json.load(file))
 
     return data
+
+
+if __name__ == "__main__":
+    print(read_user_settings())
