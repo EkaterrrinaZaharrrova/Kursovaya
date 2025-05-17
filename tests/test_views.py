@@ -1,13 +1,13 @@
 import datetime
 from typing import Any
 from unittest.mock import patch
+
 import pandas as pd
 import pytest
 
 from src.requests_api import external_request_api_currency
 from src.services import simple_search
 from src.views import greetings, top_transactions
-from tests.conftest import excel_data
 
 
 @pytest.mark.parametrize(
@@ -65,5 +65,3 @@ def test_simple_search(dict_data: list[dict]) -> None:
         '50.0, "category": "Фастфуд", "description": "OOO Frittella", "Investment '
         'bank": 0, "add with round": 314.0}]'
     )
-
-
